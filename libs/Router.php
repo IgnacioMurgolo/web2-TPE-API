@@ -1,5 +1,4 @@
 <?php
-
 class Route {
     private $url;
     private $verb;
