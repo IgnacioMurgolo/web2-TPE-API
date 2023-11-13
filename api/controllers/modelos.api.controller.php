@@ -1,12 +1,19 @@
 <?php
 require_once 'api/models/api.modelos.model.php';
+require_once 'api/controllers/api.controller.php';
+require_once 'api/helpers/auth.api.helper.php';
+
 class ModelosApiController extends ApiController
 {
     private $modelosModel;
-    private $apiview;
-    public function __construct(){
+    private $authHelper;
+    private $apiView;
+    public function __construct()
+    {
+        parent::__construct();
+        $this->apiView = new ApiView();
         $this->modelosModel = new ModelosModel();
-        $this->apiview = new APIView();
+        $this->authHelper = new AuthHelper();
     }
 
     public function getModelo($params = [])
@@ -76,28 +83,15 @@ class ModelosApiController extends ApiController
         }
     }
 
-    public function deleteModelo($params = [])
-    {
-        if (isset($params[':modelo'])) {
-            $modelo = $params[':modelo'];
-            $existeModelo = $this->modelosModel->getModelosByModelo($modelo);
-            $existeMoto = $this->motosModel->getModeloMoto($modelo);
-            if ($existeModelo) {
-                if (!$existeMoto) {
-                    $this->modelosModel->deleteModelo($modelo);
-                    $this->apiView->response('se eliminó la moto con éxito la moto con modelo = ' . $modelo, 200);
-                    $this->getModelo();
-                } else {
-                    $this->apiView->response('no se puede borrar, existe moto con ese modelo', 404);
-                }
-            } else {
-                $this->apiView->response('no existe moto con ese modelo', 404);
-            }
-        }
-    }
 
     public function editModelo($params = [])
     {
+        $user = $this->authHelper->currentUser();
+            if(!$user) {
+                $this->apiView->response('Unauthorized', 401);
+                return;
+            }
+
         if (isset($params[':modelo'])) {
             $modelo = $params[':modelo'];
             $existeModelo = $this->modelosModel->getModelosByModelo($modelo);
@@ -120,6 +114,12 @@ class ModelosApiController extends ApiController
 
     public function insertModelo()
     {
+        $user = $this->authHelper->currentUser();
+            if(!$user) {
+                $this->apiView->response('Unauthorized', 401);
+                return;
+            }
+
         $body = $this->getData();
         if (isset($body->modelo) && isset($body->cilindrada) && isset($body->velocidad_max) && isset($body->tipo_uso) && isset($body->capacidad_tanque)) {
             $modelo = $body->modelo;

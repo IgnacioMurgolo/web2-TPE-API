@@ -14,12 +14,11 @@ class MotosModel extends DB
 
     public function getMotoById($id)
     {
-        $query = $this->connect()->prepare('SELECT * FROM moto WHERE id=?');
+        $query = $this->connect()->prepare('SELECT * FROM moto JOIN caracteristica ON moto.modelo = caracteristica.modelo WHERE moto.id=?');
         $query->execute([$id]);
         $moto = $query->fetch(PDO::FETCH_OBJ);
         return $moto;
     }
-
 
     public function deleteMoto($id)
     {
@@ -39,13 +38,6 @@ class MotosModel extends DB
         $query->execute([$marca, $modelo, $anio, $precio]);
         $moto = $query->fetch(PDO::FETCH_OBJ);
         return $moto;
-    }
-
-    public function getModeloMoto($modelo){
-        $query = $this->connect()->prepare('SELECT * FROM moto WHERE modelo=?');
-        $query->execute([$modelo]);
-        $motos = $query->fetchAll(PDO::FETCH_OBJ);
-        return $motos;
     }
 
     public function addMoto($marca, $modelo, $anio, $precio)
@@ -83,7 +75,31 @@ class MotosModel extends DB
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
+    public function getMotosFiltroMarca($marca)
+    {
+        $query = $this->connect()->prepare('SELECT * FROM moto JOIN caracteristica ON moto.modelo=caracteristica.modelo WHERE moto.marca=?');
+        $query->execute([$marca]);
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
 
-
+    public function getMotosFiltroModelo($modelo)
+    {
+        $query = $this->connect()->prepare('SELECT * FROM moto JOIN caracteristica ON moto.modelo=caracteristica.modelo moto WHERE modelo=?');
+        $query->execute([$modelo]);
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
+    public function getMotosFiltroAnio($anio)
+    {
+        $query = $this->connect()->prepare('SELECT * FROM moto JOIN caracteristica ON moto.modelo=caracteristica.modelo WHERE anio=?');
+        $query->execute([$anio]);
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
+    public function getMotosFiltroPrecio($precio)
+    {
+        $query = $this->connect()->prepare('SELECT * FROM moto JOIN caracteristica ON moto.modelo=caracteristica.modelo WHERE precio=?');
+        $query->execute([$precio]);
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
 
 }
+?>

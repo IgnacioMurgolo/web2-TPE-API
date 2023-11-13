@@ -1,14 +1,20 @@
 <?php
 require_once 'api/models/api.motos.model.php';
+require_once 'api/controllers/api.controller.php';
+require_once 'api/helpers/auth.api.helper.php';
 
 class MotosApiController extends ApiController
 {
     private $motosModel;
+    private $authHelper;
     private $apiView;
 
-    public function __construct(){
-        $this->motosModel = new MotosModel();
+    public function __construct()
+    {
+        parent::__construct();
         $this->apiView = new ApiView();
+        $this->motosModel = new MotosModel();
+        $this->authHelper = new AuthHelper();
     }
     public function getMoto($params = [])
     {
@@ -79,23 +85,15 @@ class MotosApiController extends ApiController
         }
     }
 
-    public function deleteMoto($params = [])
-    {
-        if (isset($params[':ID'])) {
-            $id = $params[':ID'];
-            $existeId = $this->motosModel->getMotoById($id);
-            if ($existeId) {
-                $this->motosModel->deleteMoto($id);
-                $this->apiView->response('se eliminó la moto con éxito la moto con id = ' . $id, 200);
-                $this->getMoto();
-            } else {
-                $this->apiView->response('no existe moto con ese id', 404);
-            }
-        }
-    }
 
     public function editMoto($params = [])
     {
+        $user = $this->authHelper->currentUser();
+        if (!$user) {
+            $this->apiView->response('Unauthorized', 401);
+            return;
+        }
+
         if (isset($params[':ID'])) {
             $id = $params[':ID'];
             $existeId = $this->motosModel->getMotoById($id);
@@ -116,8 +114,14 @@ class MotosApiController extends ApiController
         }
     }
 
+
     public function insertMoto()
     {
+        $user = $this->authHelper->currentUser();
+        if (!$user) {
+            $this->apiView->response('Unauthorized', 401);
+            return;
+        }
         $body = $this->getData();
         if (isset($body->marca) && isset($body->modelo) && isset($body->anio) && isset($body->precio)) {
             $moto = $this->motosModel->getMoto($body->marca, $body->modelo, $body->anio, $body->precio);

@@ -18,32 +18,12 @@ class ModelosModel extends DB
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function getModelo($cilindrada, $velocidad_max, $tipo_uso, $capacidad_tanque)
-    {
-        $query = $this->connect()->prepare('SELECT * FROM caracteristica WHERE cilindrada=? AND velocidad_max=? AND tipo_uso=? AND capacidad_tanque=?');
-        $query->execute([$cilindrada, $velocidad_max, $tipo_uso, $capacidad_tanque]);
-        return $query->fetch(PDO::FETCH_OBJ);
-    }
-
-    public function verificarModeloMoto($modelo)
-    {
-        $query = $this->connect()->prepare('SELECT modelo FROM moto WHERE modelo=?');
-        $query->execute([$modelo]);
-        $existe = $query->fetchAll(PDO::FETCH_OBJ);
-        return $existe;
-    }
-
     public function addModelo($modelo, $cilindrada, $velocidad_max, $tipo_uso, $capacidad_tanque)
     {
         $query = $this->connect()->prepare('INSERT INTO caracteristica (modelo, cilindrada, velocidad_max, tipo_uso, capacidad_tanque) VALUES (?,?,?,?,?)');
         $query->execute([$modelo, $cilindrada, $velocidad_max, $tipo_uso, $capacidad_tanque]);
     }
 
-    public function deleteModelo($modelo)
-    {
-        $query = $this->connect()->prepare('DELETE FROM caracteristica WHERE modelo=?');
-        $query->execute([$modelo]);
-    }
 
     public function updateModelo($modelo, $cilindrada, $velocidad_max, $tipo_uso, $capacidad_tanque)
     {
